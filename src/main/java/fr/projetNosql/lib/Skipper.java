@@ -15,6 +15,11 @@ public class Skipper {
         this.prenom = prenom;
         this.tarif = tarif;
     }
+    public Skipper(String nom, String prenom, int tarif) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.tarif = tarif;
+    }
     public ObjectId getId() {
         return id;
     }
@@ -31,4 +36,15 @@ public class Skipper {
         return tarif;
     }
 
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.nom = prenom;
+    }
+
+    public void setTarif(int tarif) {
+        this.tarif = tarif;
+    }
 }

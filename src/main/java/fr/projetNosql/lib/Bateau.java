@@ -17,6 +17,13 @@ public class Bateau extends TypeBateau {
         this.caution = caution;
     }
 
+    public Bateau(int nbPlace, int puissance, int caution, ObjectId idTypeBateau, String nomTypeBateau) {
+        super(idTypeBateau, nomTypeBateau);
+        this.nbPlace = nbPlace;
+        this.puissance = puissance;
+        this.caution = caution;
+    }
+
     public ObjectId getIdBateau() {
         return idBateau;
     }
@@ -33,4 +40,20 @@ public class Bateau extends TypeBateau {
         return caution;
     }
 
+    public void setNbPersonne(int nbPersonne) {
+        this.nbPlace = nbPersonne;
+    }
+
+    public void setPuissance(int puissance) {
+        this.puissance = puissance;
+    }
+
+    public void setCaution(int caution) {
+        this.caution = caution;
+    }
+
+    public void setTypeBateau(TypeBateau typeBateau) {
+        this.idTypeBateau = typeBateau.getIdTypeBateau();
+        this.nomTypeBateau = typeBateau.getNomTypeBateau();
+    }
 }

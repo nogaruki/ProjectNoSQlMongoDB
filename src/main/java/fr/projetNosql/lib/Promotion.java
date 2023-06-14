@@ -14,7 +14,12 @@ public class Promotion {
         this.montant = montant;
     }
 
-    public ObjectId getId() {
+    public Promotion(String code, int montant) {
+        this.code = code;
+        this.montant = montant;
+    }
+
+        public ObjectId getId() {
         return id;
     }
 
@@ -24,5 +29,13 @@ public class Promotion {
 
     public int getMontant() {
         return montant;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setMontant(int montant) {
+        this.montant = montant;
     }
 }

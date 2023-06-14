@@ -8,10 +8,10 @@ import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -288,7 +288,6 @@ public class Cluster {
     public void insertLocation(Location location) {
         MongoCollection<Document> collection = database.getCollection("Location");
         MongoCollection<Document> collectionAvoir = database.getCollection("Avoir");
-
         Document docLoc = new Document("dateDebut", location.getDateDebut())
                 .append("dateFin", location.getDateFin())
                 .append("prix", location.getPrix())
@@ -364,5 +363,504 @@ public class Cluster {
             locations.add(location);
         }
         return locations;
+    }
+
+    public void afficherBateauxDispo() {
+        ArrayList<Bateau> bateaux = getAllBateau();
+        ArrayList<Location> locations = getAllLocation();
+        for (Bateau bateau : bateaux) {
+            boolean dispo = true;
+            for (Location location : locations) {
+                if (location.getBateau().equals(bateau)) {
+                    dispo = false;
+                }
+            }
+            if (dispo) {
+                System.out.println(bateau);
+            }
+        }
+
+    }
+
+
+    public void ajouterBateau() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Nombre de personne : ");
+        int nbPersonne = sc.nextInt();
+        System.out.println("Prix : ");
+        int prix = sc.nextInt();
+        System.out.println("Caution : ");
+        int caution = sc.nextInt();
+        int index = -1;
+        do {
+            System.out.println("Type du bateau : ");
+            String typeBateau = sc.nextLine();
+            index= getAllTypeBateau().indexOf(typeBateau);
+        } while (index == -1);
+        TypeBateau typeBateau = getAllTypeBateau().get(index);
+        Bateau bateau = new Bateau(nbPersonne, prix, caution, typeBateau.idTypeBateau, typeBateau.nomTypeBateau);
+        insertBateau(bateau);
+
+        System.out.println("Bateau ajouté");
+    }
+
+    public void ajouterSkipper() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Nom: ");
+        String nbPersonne = sc.nextLine();
+        System.out.println("Prenom : ");
+        String prix = sc.nextLine();
+        System.out.println("Tarif : ");
+        int caution = sc.nextInt();
+        Skipper skipper = new Skipper(nbPersonne, prix, caution);
+        insertSkipper(skipper);
+        System.out.println("Skipper ajouté");
+    }
+
+    public void ajouterClient() {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Nom: ");
+        String nom = sc.nextLine();
+        System.out.println("Prenom : ");
+        String prenom = sc.nextLine();
+        System.out.println("Adresse : ");
+        String adresse = sc.nextLine();
+        System.out.println("Code postal : ");
+        String codePostal = sc.nextLine();
+        System.out.println("Ville : ");
+        String ville = sc.nextLine();
+        System.out.println("Complement : ");
+        String complement = sc.nextLine();
+        System.out.println("Telephone : ");
+        String telephone = sc.nextLine();
+        System.out.println("Email : ");
+        String email = sc.nextLine();
+        System.out.println("Mot de passe : ");
+        String motDePasse = sc.nextLine();
+        Client client = new Client(nom, prenom, adresse, codePostal, ville, complement, telephone, email, motDePasse);
+        insertClient(client);
+        System.out.println("Client ajouté");
+        
+    }
+
+    public void ajouterMateriel() {
+        Scanner sc = new Scanner(System.in);
+
+
+        System.out.println("Nom: ");
+        String nom = sc.nextLine();
+        System.out.println("Prix : ");
+        int prix = sc.nextInt();
+        System.out.println("Caution : ");
+        int caution = sc.nextInt();
+        Materiel materiel = new Materiel(nom, prix, caution);
+        insertMateriel(materiel);
+        System.out.println("Materiel ajouté");
+    }
+
+    public void ajouterPromotion() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Code: ");
+        String code = sc.nextLine();
+        System.out.println("Montant : ");
+        int montant = sc.nextInt();
+        Promotion promotion = new Promotion(code, montant);
+        insertPromotion(promotion);
+        System.out.println("Promotion ajouté");
+    }
+
+    public void ajouterLocation() {
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Nombre de personne : ");
+        int nbPersonne = sc.nextInt();
+        Date dateDebut = null;
+        Date dateFin = null;
+
+        do {
+            System.out.println("Date de debut (dd/MM/yyyy): ");
+            String dateDebutString = sc.nextLine();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                dateDebut = formatter.parse(dateDebutString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }while (dateDebut == null);
+
+        do {
+            System.out.println("Date de debut (dd/MM/yyyy): ");
+            String dateFinString = sc.nextLine();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            try {
+                dateFin = formatter.parse(dateFinString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }while (dateFin == null);
+        System.out.println("Forfait : ");
+        int forfait = sc.nextInt();
+        System.out.println("Prix : ");
+        int prix = sc.nextInt();
+        Promotion promotion = null;
+        String codePromotion = null;
+        do {
+            System.out.println("Promotion (indiquer l'id): ");
+            codePromotion= sc.nextLine();
+            ObjectId idPromotion = new ObjectId(codePromotion);
+            promotion = getOnePromotion(idPromotion);
+            if(promotion == null && !codePromotion.equals("")){
+                System.out.println("Erreur : la promotion n'existe pas");
+            }
+        }while (promotion == null && !codePromotion.equals(""));
+        Skipper skipper = null;
+        do {
+            System.out.println("Skipper (indiquer l'id): ");
+            String nomSkipper = sc.nextLine();
+            ObjectId idSkipper = new ObjectId(nomSkipper);
+            skipper = getOneSkipper(idSkipper);
+            if(skipper == null){
+                System.out.println("Erreur : le skipper n'existe pas");
+            }
+        }while (skipper == null);
+        Bateau bateau = null;
+        do {
+            System.out.println("Bateau (indiquer l'id): ");
+            String nomBateau = sc.nextLine();
+            ObjectId idBateau = new ObjectId(nomBateau);
+            bateau = getOneBateau(idBateau);
+            if(bateau == null){
+                System.out.println("Erreur : le bateau n'existe pas");
+            }
+        }while (bateau == null);
+        Client client = null;
+        do {
+            System.out.println("Client (indiquer l'id): ");
+            String emailClient = sc.nextLine();
+            ObjectId idClient = new ObjectId(emailClient);
+            client = getOneClient(idClient);
+            if(client == null){
+                System.out.println("Erreur : le client n'existe pas");
+            }
+        }while (client == null);
+        String codeMateriels = null;
+        HashMap<Materiel, Integer> listMateriel = new HashMap<Materiel, Integer>();
+        do {
+            System.out.println("Materiel (indiquer les ids séparé par ',') : ");
+            System.out.println("Quantite  (indiquer les ids séparé par ',') : ");
+
+            codeMateriels= sc.nextLine();
+            ArrayList<String> listCodeMateriel = new ArrayList<String>(Arrays.asList(codeMateriels.split(",")));
+            ArrayList<String> listQuantite = new ArrayList<String>(Arrays.asList(codeMateriels.split(",")));
+            if(listCodeMateriel.size() != listQuantite.size()){
+                System.out.println("Erreur : le nombre de materiel et de quantite ne correspond pas");
+            } else {
+                for (int i = 0; i < listCodeMateriel.size(); i++) {
+                    Materiel materiel = null;
+                    ObjectId idMateriel = new ObjectId(listCodeMateriel.get(i));
+                    materiel = getOneMateriel(idMateriel);
+                    if (materiel == null) {
+                        System.out.println("Erreur : le materiel: '" + listCodeMateriel.get(i) + "' n'existe pas");
+                        break;
+                    }
+                    listMateriel.put(materiel, Integer.parseInt(listQuantite.get(i)));
+                }
+            }
+
+        }while (listMateriel.size() == 0 && !codeMateriels.equals(""));
+        Location location = new Location(nbPersonne, dateDebut, dateFin, forfait, prix, promotion, skipper, bateau, client, listMateriel);
+        insertLocation(location);
+        System.out.println("Location ajouté");
+
+    }
+
+    public void supprimerBateau() {
+        Scanner sc = new Scanner(System.in);
+        Bateau bateau = null;
+
+        do {
+            System.out.println("Id du bateau à supprimer : ");
+            String id = sc.nextLine();
+            bateau = getOneBateau(new ObjectId(id));
+            if(bateau == null){
+                System.out.println("Erreur : le bateau n'existe pas");
+                return;
+            }
+        }while (bateau == null);
+
+        deleteBateau(bateau);
+        System.out.println("Bateau supprimé");
+    }
+
+    public void supprimerSkipper() {
+        Scanner sc = new Scanner(System.in);
+        Skipper skipper = null;
+        do {
+             System.out.println("Id du skipper à supprimer : ");
+            String id = sc.nextLine();
+            skipper = getOneSkipper(new ObjectId(id));
+            if(skipper == null){
+                System.out.println("Erreur : le skipper n'existe pas");
+                return;
+            }
+        }while (skipper == null);
+        deleteSkipper(skipper);
+        System.out.println("Skipper supprimé");
+    }
+
+    public void supprimerClient() {
+        Scanner sc = new Scanner(System.in);
+        Client client = null;
+        do {
+            System.out.println("Id du client à supprimer : ");
+            String id = sc.nextLine();
+            client = getOneClient(new ObjectId(id));
+            if(client == null){
+                System.out.println("Erreur : le client n'existe pas");
+                return;
+            }
+        }while (client == null);
+        deleteClient(client);
+        System.out.println("Client supprimé");
+    }
+
+    public void supprimerMateriel() {
+        Scanner sc = new Scanner(System.in);
+        Materiel materiel = null;
+        do {
+            System.out.println("Id du materiel à supprimer : ");
+            String id = sc.nextLine();
+            materiel = getOneMateriel(new ObjectId(id));
+            if(materiel == null){
+                System.out.println("Erreur : le materiel n'existe pas");
+                return;
+            }
+        }while (materiel == null);
+        deleteMateriel(materiel);
+        System.out.println("Materiel supprimé");
+    }
+
+    public void supprimerPromotion() {
+        Scanner sc = new Scanner(System.in);
+        Promotion promotion = null;
+        do {
+            System.out.println("Id de la promotion à supprimer : ");
+            String id = sc.nextLine();
+            promotion = getOnePromotion(new ObjectId(id));
+            if(promotion == null){
+                System.out.println("Erreur : la promotion n'existe pas");
+                return;
+            }
+        }while (promotion == null);
+        deletePromotion(promotion);
+        System.out.println("Promotion supprimé");
+    }
+
+    public void supprimerLocation() {
+        Scanner sc = new Scanner(System.in);
+        Location location = null;
+        do {
+            System.out.println("Id de la location à supprimer : ");
+            String id = sc.nextLine();
+            location = getOneLocation(new ObjectId(id));
+            if(location == null){
+                System.out.println("Erreur : la location n'existe pas");
+                return;
+            }
+        }while (location == null);
+        deleteLocation(location);
+        System.out.println("Location supprimé");
+    }
+
+    public void modifierBateau() {
+        Scanner sc = new Scanner(System.in);
+        Bateau bateau = null;
+        do {
+            System.out.println("Id du bateau à modifier : ");
+            String id = sc.nextLine();
+            bateau = getOneBateau(new ObjectId(id));
+            if(bateau == null){
+                System.out.println("Erreur : le bateau n'existe pas");
+                return;
+            }
+        }while (bateau == null);
+
+        System.out.println("Nombre de personne ("+bateau.getNbPlace()+") : ");
+        int nbPersonne = sc.nextInt();
+        System.out.println("Puissance ("+bateau.getPuissance()+"): ");
+        int puisssance = sc.nextInt();
+        System.out.println("Caution ("+bateau.getCaution()+"): ");
+        int caution = sc.nextInt();
+        int index = -1;
+        do {
+            System.out.println("Type du bateau ("+bateau.getIdTypeBateau()+"): ");
+            String typeBateau = sc.nextLine();
+            index= getAllTypeBateau().indexOf(typeBateau);
+        } while (index == -1);
+        TypeBateau typeBateau = getAllTypeBateau().get(index);
+        bateau.setNbPersonne(nbPersonne);
+        bateau.setPuissance(puisssance);
+        bateau.setCaution(caution);
+        bateau.setTypeBateau(typeBateau);
+        updateBateau(bateau);
+        System.out.println("Bateau mis à jour");
+
+    }
+
+    public void modifierSkipper() {
+        Scanner sc = new Scanner(System.in);
+        Skipper skipper = null;
+        do {
+            System.out.println("Id du skipper à modifier : ");
+            String id = sc.nextLine();
+            skipper = getOneSkipper(new ObjectId(id));
+            if(skipper == null){
+                System.out.println("Erreur : le skipper n'existe pas");
+                return;
+            }
+        }while (skipper == null);
+
+        System.out.println("Nom ("+skipper.getNom()+") : ");
+        String nom = sc.nextLine();
+        System.out.println("Prenom ("+skipper.getPrenom()+"): ");
+        String prenom = sc.nextLine();
+        System.out.println("Tarif("+skipper.getTarif()+"): ");
+        int prix = sc.nextInt();
+        skipper.setNom(nom);
+        skipper.setPrenom(prenom);
+        skipper.setTarif(prix);
+        updateSkipper(skipper);
+        System.out.println("Skipper mis à jour");
+
+    }
+
+    public void modifierClient() {
+
+        Scanner sc = new Scanner(System.in);
+        Client client = null;
+        do {
+            System.out.println("Id du client à modifier : ");
+            String id = sc.nextLine();
+            client = getOneClient(new ObjectId(id));
+            if(client == null){
+                System.out.println("Erreur : le client n'existe pas");
+                return;
+            }
+        }while (client == null);
+
+        System.out.println("Nom ("+client.getNom()+") : ");
+        String nom = sc.nextLine();
+        System.out.println("Prenom ("+client.getPrenom()+"): ");
+        String prenom = sc.nextLine();
+        System.out.println("Adresse ("+client.getAdresse()+"): ");
+        String adresse = sc.nextLine();
+        System.out.println("Telephone ("+client.getTelephone()+"): ");
+        String telephone = sc.nextLine();
+        System.out.println("Email ("+client.getEmail()+"): ");
+        String email = sc.nextLine();
+        client.setNom(nom);
+        client.setPrenom(prenom);
+        client.setAdresse(adresse);
+        client.setTelephone(telephone);
+        client.setEmail(email);
+        updateClient(client);
+        System.out.println("Client mis à jour");
+
+    }
+
+    public void modifierMateriel() {
+        Scanner sc = new Scanner(System.in);
+        Materiel materiel = null;
+        do {
+            System.out.println("Id du materiel à modifier : ");
+            String id = sc.nextLine();
+            materiel = getOneMateriel(new ObjectId(id));
+            if(materiel == null){
+                System.out.println("Erreur : le materiel n'existe pas");
+                return;
+            }
+        }while (materiel == null);
+
+        System.out.println("Nom ("+materiel.getNom()+") : ");
+        String nom = sc.nextLine();
+        System.out.println("Prix ("+materiel.getPrix()+"): ");
+        int prix = sc.nextInt();
+        System.out.println("Caution ("+materiel.getCaution()+"): ");
+        int caution = sc.nextInt();
+        materiel.setNom(nom);
+        materiel.setPrix(prix);
+        materiel.setCaution(caution);
+        updateMateriel(materiel);
+        System.out.println("Materiel mis à jour");
+
+    }
+
+    public void modifierPromotion() {
+        Scanner sc = new Scanner(System.in);
+        Promotion promotion = null;
+        do {
+            System.out.println("Id de la promotion à modifier : ");
+            String id = sc.nextLine();
+            promotion = getOnePromotion(new ObjectId(id));
+            if(promotion == null){
+                System.out.println("Erreur : la promotion n'existe pas");
+                return;
+            }
+        }while (promotion == null);
+
+        System.out.println("Code ("+promotion.getCode()+") : ");
+        String code = sc.nextLine();
+        System.out.println("Montant ("+promotion.getMontant()+"): ");
+        int pourcentage = sc.nextInt();
+        promotion.setCode(code);
+        promotion.setMontant(pourcentage);
+        updatePromotion(promotion);
+        System.out.println("Promotion mis à jour");
+
+    }
+
+    public void afficherBateaux() {
+        List<Bateau> bateaux = getAllBateau();
+        for (Bateau bateau : bateaux) {
+            System.out.println(bateau);
+        }
+    }
+
+    public void afficherSkippers() {
+        List<Skipper> skippers = getAllSkipper();
+        for (Skipper skipper : skippers) {
+            System.out.println(skipper);
+        }
+    }
+
+    public void afficherClients() {
+        List<Client> clients = getAllClient();
+        for (Client client : clients) {
+            System.out.println(client);
+        }
+    }
+
+    public void afficherMateriels() {
+        List<Materiel> materiels = getAllMateriel();
+        for (Materiel materiel : materiels) {
+            System.out.println(materiel);
+        }
+    }
+
+    public void afficherPromotion() {
+        List<Promotion> promotions = getAllPromotion();
+        for (Promotion promotion : promotions) {
+            System.out.println(promotion);
+        }
+    }
+
+    public void affficherLocation() {
+        List<Location> locations = getAllLocation();
+        for (Location location : locations) {
+            System.out.println(location);
+        }
     }
 }

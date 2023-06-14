@@ -32,6 +32,19 @@ public class Location {
         this.materiels = materiels;
     }
 
+    public Location(int nbPersonne, Date dateDebut, Date dateFin, int forfait, int prix, Promotion promotion, Skipper skipper, Bateau bateau, Client client, HashMap<Materiel, Integer> materiels) {
+        this.nbPersonne = nbPersonne;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
+        this.forfait = forfait;
+        this.prix = prix;
+        this.promotion = promotion;
+        this.skipper = skipper;
+        this.bateau = bateau;
+        this.client = client;
+        this.materiels = materiels;
+    }
+
     public ObjectId getId() {
         return id;
     }
