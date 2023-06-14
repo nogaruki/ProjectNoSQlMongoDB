@@ -133,7 +133,7 @@ public class Cluster {
         MongoCollection<Document> collection = database.getCollection("Bateau");
         Document document = new Document("nbPlace", bateau.getNbPlace())
                 .append("caution", bateau.getCaution())
-                .append("puissanceMoteur", bateau.getPuissance());
+                .append("puissance", bateau.getPuissance());
         collection.insertOne(document);
     }
 
@@ -146,7 +146,7 @@ public class Cluster {
         MongoCollection<Document> collection = database.getCollection("Bateau");
         collection.updateOne(eq("_id", bateau.getIdBateau()), new Document("$set", new Document("nbPlace", bateau.getNbPlace())
                 .append("caution", bateau.getCaution())
-                .append("puissanceMoteur", bateau.getPuissance())
+                .append("puissance", bateau.getPuissance())
                 .append("idTypeBateau", bateau.getIdTypeBateau())));
     }
 
@@ -155,7 +155,7 @@ public class Cluster {
         MongoCollection<Document> collectionTypeBateau = database.getCollection("TypeBateau");
         Document document = collection.find(eq("_id", bateauID)).first();
         Document documentTypeBateau = collectionTypeBateau.find(eq("_id", document.getObjectId("idTypeBateau"))).first();
-        return new Bateau(document.getObjectId("_id"), document.getInteger("nbPlace"), document.getInteger("caution"), document.getInteger("puissanceMoteur"), documentTypeBateau.getObjectId("_id"), documentTypeBateau.getString("nomTypeBateau"));
+        return new Bateau(document.getObjectId("_id"), document.getInteger("nbPlace"), document.getInteger("caution"), document.getInteger("puissance"), documentTypeBateau.getObjectId("_id"), documentTypeBateau.getString("nomTypeBateau"));
     }
 
     public ArrayList<Bateau> getAllBateau() {
@@ -165,7 +165,7 @@ public class Cluster {
         ArrayList<Bateau> bateaux = new ArrayList<>();
         for (Document document : collection.find()) {
             Document documentTypeBateau = collectionTypeBateau.find(eq("_id", document.getObjectId("idTypeBateau"))).first();
-            bateaux.add(new Bateau(document.getObjectId("_id"), document.getInteger("nbPlace"), document.getInteger("caution"), document.getInteger("puissanceMoteur"), documentTypeBateau.getObjectId("_id"), documentTypeBateau.getString("nomTypeBateau")));
+            bateaux.add(new Bateau(document.getObjectId("_id"), document.getInteger("nbPlace"), document.getInteger("caution"), document.getInteger("puissance"), documentTypeBateau.getObjectId("_id"), documentTypeBateau.getString("nomTypeBateau")));
         }
         return bateaux;
     }
